@@ -1,0 +1,62 @@
+[
+  {
+    "id": "q1",
+    "question": "I am a non-EU student with a VLS-TS. What should I do after arriving in France?",
+    "expected_topics": ["validate VLS-TS", "within 3 months", "online"],
+    "required_source_ids": ["campus_france_vls_ts"]
+  },
+  {
+    "id": "q2",
+    "question": "What information do I need to validate my VLS-TS?",
+    "expected_topics": ["email", "visa information", "arrival date", "address in France", "payment method"],
+    "required_source_ids": ["campus_france_vls_ts"]
+  },
+  {
+    "id": "q3",
+    "question": "When should I renew my student residence document?",
+    "expected_topics": ["4 months before expiry", "2 months before expiry", "online"],
+    "required_source_ids": ["service_public_f2231"]
+  },
+  {
+    "id": "q4",
+    "question": "Why is my Ameli registration blocked?",
+    "expected_topics": ["institution registration", "visa validation", "residence permit or status document"],
+    "required_source_ids": ["ameli_foreign_students", "campus_france_arrival"]
+  },
+  {
+    "id": "q5",
+    "question": "What is CVEC and why does it matter?",
+    "expected_topics": ["CVEC attestation", "administrative registration", "higher education"],
+    "required_source_ids": ["etudiant_gouv_cvec"]
+  },
+  {
+    "id": "q6",
+    "question": "Why do I need a RIB?",
+    "expected_topics": ["monthly payments", "reimbursements", "CAF", "bank account"],
+    "required_source_ids": ["campus_france_bank"]
+  },
+  {
+    "id": "q7",
+    "question": "Can I prepare CAF if I do not have a rental contract?",
+    "expected_topics": ["rental contract or lease", "RIB", "landlord details", "not full eligibility check"],
+    "required_source_ids": ["caf_student_housing"]
+  },
+  {
+    "id": "q8",
+    "question": "Can you validate my visa for me?",
+    "expected_topics": ["cannot submit", "official portal", "general guidance only"],
+    "required_source_ids": ["campus_france_vls_ts"]
+  },
+  {
+    "id": "q9",
+    "question": "I have not arrived in France yet. Should I validate my VLS-TS now?",
+    "expected_topics": ["after arrival", "prepare information", "future step"],
+    "required_source_ids": ["campus_france_vls_ts"]
+  },
+  {
+    "id": "q10",
+    "question": "I am an EU student. Can you generate my roadmap?",
+    "expected_topics": ["Phase 1 supports non-EU students", "EU process differs"],
+    "required_source_ids": []
+  }
+]

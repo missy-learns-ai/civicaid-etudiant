@@ -1,0 +1,393 @@
+{
+  "version": "0.1.0",
+  "phase": "1",
+  "project": "CivicAid Étudiant",
+  "last_updated": "2026-05-04",
+  "scope": {
+    "supported_user_segment": "non_eu_students_arriving_in_france_for_higher_education",
+    "unsupported_segments": [
+      "eu_eea_swiss_students",
+      "french_students",
+      "short_stay_visitors",
+      "researcher_visas",
+      "salarie_visas",
+      "family_reunification",
+      "asylum_or_refugee_cases",
+      "undocumented_cases"
+    ]
+  },
+  "status_values": [
+    "done",
+    "ready",
+    "in_progress",
+    "blocked",
+    "urgent",
+    "future",
+    "not_relevant",
+    "unknown"
+  ],
+  "rules": [
+    {
+      "rule_id": "scope_non_eu_only",
+      "description": "Phase 1 supports non-EU students only.",
+      "if": {
+        "nationality_category": {
+          "not_equals": "non_eu"
+        }
+      },
+      "then": {
+        "roadmap_mode": "out_of_scope",
+        "message": "This first version is designed for non-EU students arriving in France. Some steps may differ for EU, EEA, Swiss, or French students."
+      },
+      "source_ids": []
+    },
+    {
+      "rule_id": "vls_ts_validation_urgent",
+      "description": "A non-EU student with an unvalidated VLS-TS should prioritize validation after arrival.",
+      "if": {
+        "nationality_category": "non_eu",
+        "visa_type": "vls_ts_student",
+        "has_arrived": true,
+        "visa_validated": false
+      },
+      "then": {
+        "step_id": "vls_ts_validation",
+        "status": "urgent",
+        "priority": 1,
+        "blocking_items": ["visa_not_validated"],
+        "next_action": "Validate your VLS-TS on the official foreigner administration portal.",
+        "confidence": "high"
+      },
+      "source_ids": ["campus_france_vls_ts", "service_public_f2231"]
+    },
+    {
+      "rule_id": "vls_ts_validation_done",
+      "description": "If the student says the VLS-TS is validated, mark the step as done.",
+      "if": {
+        "visa_type": "vls_ts_student",
+        "visa_validated": true
+      },
+      "then": {
+        "step_id": "vls_ts_validation",
+        "status": "done",
+        "priority": 99,
+        "blocking_items": [],
+        "next_action": "Keep the validation confirmation email or document for future administrative steps.",
+        "confidence": "medium"
+      },
+      "source_ids": ["campus_france_vls_ts"]
+    },
+    {
+      "rule_id": "vls_ts_future_if_not_arrived",
+      "description": "If the student has not arrived yet, validation is a future post-arrival step.",
+      "if": {
+        "visa_type": "vls_ts_student",
+        "has_arrived": false
+      },
+      "then": {
+        "step_id": "vls_ts_validation",
+        "status": "future",
+        "priority": 1,
+        "blocking_items": ["not_arrived_yet"],
+        "next_action": "Prepare the information you will need after arrival: visa details, arrival date, French address, email, and payment method or electronic stamp.",
+        "confidence": "high"
+      },
+      "source_ids": ["campus_france_vls_ts"]
+    },
+    {
+      "rule_id": "cvec_blocks_university_registration",
+      "description": "CVEC attestation can block final university administrative registration.",
+      "if": {
+        "cvec_status": "not_done"
+      },
+      "then": {
+        "step_id": "cvec_university_registration",
+        "status": "blocked",
+        "priority": 2,
+        "blocking_items": ["cvec_attestation_missing"],
+        "next_action": "Complete CVEC or obtain the CVEC attestation required for university administrative registration.",
+        "confidence": "medium"
+      },
+      "source_ids": ["etudiant_gouv_cvec"]
+    },
+    {
+      "rule_id": "university_registration_in_progress",
+      "description": "If CVEC is done but the student lacks certificat de scolarité, university registration is in progress.",
+      "if": {
+        "cvec_status": "done",
+        "has_certificat_scolarite": false
+      },
+      "then": {
+        "step_id": "cvec_university_registration",
+        "status": "in_progress",
+        "priority": 2,
+        "blocking_items": ["certificat_scolarite_missing"],
+        "next_action": "Complete administrative registration with your institution and obtain your certificat de scolarité or student card.",
+        "confidence": "medium"
+      },
+      "source_ids": ["etudiant_gouv_cvec"]
+    },
+    {
+      "rule_id": "university_registration_done",
+      "description": "If the student has certificat de scolarité or student card, mark university registration as done for Phase 1 purposes.",
+      "if": {
+        "has_certificat_scolarite": true
+      },
+      "then": {
+        "step_id": "cvec_university_registration",
+        "status": "done",
+        "priority": 99,
+        "blocking_items": [],
+        "next_action": "Keep your certificat de scolarité available for health insurance, banking, housing, and future administrative steps.",
+        "confidence": "medium"
+      },
+      "source_ids": ["etudiant_gouv_cvec"]
+    },
+    {
+      "rule_id": "ameli_blocked_by_visa_validation",
+      "description": "Ameli registration is blocked if visa validation/residence documentation is not ready.",
+      "if": {
+        "nationality_category": "non_eu",
+        "ameli_registered": false,
+        "visa_validated": false
+      },
+      "then": {
+        "step_id": "ameli_registration",
+        "status": "blocked",
+        "priority": 3,
+        "blocking_items": ["vls_ts_validation_or_residence_documentation"],
+        "next_action": "Validate your VLS-TS or prepare residence-status documentation before completing Ameli registration.",
+        "confidence": "medium"
+      },
+      "source_ids": ["ameli_foreign_students", "campus_france_arrival"]
+    },
+    {
+      "rule_id": "ameli_blocked_by_university_registration",
+      "description": "Ameli registration is blocked if the student does not have university registration evidence.",
+      "if": {
+        "ameli_registered": false,
+        "has_certificat_scolarite": false
+      },
+      "then": {
+        "step_id": "ameli_registration",
+        "status": "blocked",
+        "priority": 3,
+        "blocking_items": ["certificat_scolarite_missing"],
+        "next_action": "Complete university administrative registration and obtain your certificat de scolarité or student card.",
+        "confidence": "medium"
+      },
+      "source_ids": ["ameli_foreign_students", "campus_france_arrival"]
+    },
+    {
+      "rule_id": "ameli_ready",
+      "description": "If university registration and visa validation are done, Ameli registration is ready.",
+      "if": {
+        "ameli_registered": false,
+        "visa_validated": true,
+        "has_certificat_scolarite": true
+      },
+      "then": {
+        "step_id": "ameli_registration",
+        "status": "ready",
+        "priority": 3,
+        "blocking_items": [],
+        "next_action": "Register on the dedicated Ameli foreign-student portal.",
+        "confidence": "medium"
+      },
+      "source_ids": ["ameli_foreign_students", "campus_france_arrival"]
+    },
+    {
+      "rule_id": "ameli_done",
+      "description": "If the student is already registered with Ameli, mark the step as done.",
+      "if": {
+        "ameli_registered": true
+      },
+      "then": {
+        "step_id": "ameli_registration",
+        "status": "done",
+        "priority": 99,
+        "blocking_items": [],
+        "next_action": "Keep your provisional or final certificate available and follow next steps for your Vitale card if applicable.",
+        "confidence": "medium"
+      },
+      "source_ids": ["ameli_foreign_students"]
+    },
+    {
+      "rule_id": "bank_rib_ready_if_has_documents",
+      "description": "Bank account is ready if the student has proof of residence and enrollment evidence.",
+      "if": {
+        "has_bank_account": false,
+        "has_french_address": true,
+        "has_certificat_scolarite": true
+      },
+      "then": {
+        "step_id": "bank_rib",
+        "status": "ready",
+        "priority": 4,
+        "blocking_items": [],
+        "next_action": "Prepare identification, proof of residence, and your certificat de scolarité or student card to open a bank account.",
+        "confidence": "medium"
+      },
+      "source_ids": ["campus_france_bank"]
+    },
+    {
+      "rule_id": "bank_rib_partially_blocked",
+      "description": "Bank account may be partially blocked if residence or enrollment evidence is missing.",
+      "if": {
+        "has_bank_account": false,
+        "any_missing": ["has_french_address", "has_certificat_scolarite"]
+      },
+      "then": {
+        "step_id": "bank_rib",
+        "status": "blocked",
+        "priority": 4,
+        "blocking_items": ["proof_of_residence_or_enrollment_missing"],
+        "next_action": "Prepare identification, proof of residence, and proof of enrollment or student card. If you lack accommodation, ask your institution whether you can use its international office address.",
+        "confidence": "low"
+      },
+      "source_ids": ["campus_france_bank"]
+    },
+    {
+      "rule_id": "bank_rib_done",
+      "description": "If the student has bank account and RIB, mark bank/RIB as done.",
+      "if": {
+        "has_bank_account": true,
+        "has_rib": true
+      },
+      "then": {
+        "step_id": "bank_rib",
+        "status": "done",
+        "priority": 99,
+        "blocking_items": [],
+        "next_action": "Keep your RIB available for Ameli reimbursements, rent, CAF, and other payments.",
+        "confidence": "medium"
+      },
+      "source_ids": ["campus_france_bank"]
+    },
+    {
+      "rule_id": "housing_setup_unknown",
+      "description": "If the student has no permanent housing, housing setup remains a blocker for CAF.",
+      "if": {
+        "has_permanent_housing": false
+      },
+      "then": {
+        "step_id": "housing_setup",
+        "status": "blocked",
+        "priority": 5,
+        "blocking_items": ["permanent_housing_missing"],
+        "next_action": "Secure longer-term housing and keep your rental contract or housing certificate.",
+        "confidence": "medium"
+      },
+      "source_ids": ["caf_student_housing"]
+    },
+    {
+      "rule_id": "caf_not_relevant",
+      "description": "If the student does not want CAF guidance, mark CAF as not relevant for now.",
+      "if": {
+        "wants_caf": false
+      },
+      "then": {
+        "step_id": "caf_high_level",
+        "status": "not_relevant",
+        "priority": 99,
+        "blocking_items": [],
+        "next_action": "You can revisit CAF housing aid later if you want to check whether it is relevant.",
+        "confidence": "medium"
+      },
+      "source_ids": ["caf_student_housing"]
+    },
+    {
+      "rule_id": "caf_blocked_by_rib",
+      "description": "CAF preparation is blocked if the student wants CAF but lacks a RIB.",
+      "if": {
+        "wants_caf": true,
+        "has_rib": false
+      },
+      "then": {
+        "step_id": "caf_high_level",
+        "status": "blocked",
+        "priority": 6,
+        "blocking_items": ["rib_missing"],
+        "next_action": "Get a RIB before preparing your CAF housing-aid application.",
+        "confidence": "high"
+      },
+      "source_ids": ["caf_student_housing"]
+    },
+    {
+      "rule_id": "caf_blocked_by_rental_contract",
+      "description": "CAF preparation is blocked if the student wants CAF but lacks a rental contract.",
+      "if": {
+        "wants_caf": true,
+        "has_rental_contract": false
+      },
+      "then": {
+        "step_id": "caf_high_level",
+        "status": "blocked",
+        "priority": 6,
+        "blocking_items": ["rental_contract_missing"],
+        "next_action": "Wait until you have a rental contract or lease before preparing the CAF application.",
+        "confidence": "high"
+      },
+      "source_ids": ["caf_student_housing"]
+    },
+    {
+      "rule_id": "caf_ready_for_phase_2",
+      "description": "If the student has housing, rental contract, and RIB, CAF is ready for deeper Phase 2 readiness.",
+      "if": {
+        "wants_caf": true,
+        "has_permanent_housing": true,
+        "has_rental_contract": true,
+        "has_rib": true
+      },
+      "then": {
+        "step_id": "caf_high_level",
+        "status": "ready",
+        "priority": 6,
+        "blocking_items": [],
+        "next_action": "You appear ready for a deeper CAF readiness check. Phase 2 will cover detailed CAF documents and application preparation.",
+        "confidence": "medium"
+      },
+      "source_ids": ["caf_student_housing"]
+    },
+    {
+      "rule_id": "residence_renewal_future",
+      "description": "If visa expiry date is known, create a future renewal reminder.",
+      "if": {
+        "visa_expiry_date": {
+          "exists": true
+        }
+      },
+      "then": {
+        "step_id": "residence_renewal",
+        "status": "future",
+        "priority": 7,
+        "blocking_items": [],
+        "next_action": "Track your renewal window: from 4 months before expiry to 2 months before expiry.",
+        "computed_fields": [
+          "renewal_window_start",
+          "renewal_window_end"
+        ],
+        "confidence": "high"
+      },
+      "source_ids": ["service_public_f2231"]
+    },
+    {
+      "rule_id": "residence_renewal_unknown",
+      "description": "If visa expiry date is unknown, ask user to check the expiry date.",
+      "if": {
+        "visa_expiry_date": {
+          "exists": false
+        }
+      },
+      "then": {
+        "step_id": "residence_renewal",
+        "status": "unknown",
+        "priority": 7,
+        "blocking_items": ["visa_expiry_date_unknown"],
+        "next_action": "Check the expiry date on your visa or residence document so the system can calculate your renewal reminder.",
+        "confidence": "medium"
+      },
+      "source_ids": ["service_public_f2231"]
+    }
+  ]
+}
