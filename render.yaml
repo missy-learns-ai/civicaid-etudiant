@@ -10,24 +10,18 @@ services:
         sync: false
 
   - type: web
-    runtime: python
+    runtime: static
     name: civicaid-etudiant-dashboard
     plan: free
-    buildCommand: pip install -r frontend/requirements.txt
-    startCommand: streamlit run frontend/streamlit_app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: CIVICAID_API_HOST
-        fromService:
-          name: civicaid-etudiant-api
-          type: web
-          property: host
-      - key: CIVICAID_API_PORT
-        fromService:
-          name: civicaid-etudiant-api
-          type: web
-          property: port
-      - key: ELEVENLABS_AGENT_ID
+      - key: VITE_CIVICAID_API_BASE_URL
         sync: false
-      - key: CIVICAID_TOOL_TOKEN
+      - key: VITE_ELEVENLABS_AGENT_ID
         sync: false
-

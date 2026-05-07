@@ -5,7 +5,7 @@ CivicAid Étudiant is a voice-guided assistant for non-EU students arriving in F
 ## Architecture
 
 ```text
-Streamlit dashboard
+React dashboard
   ↓
 FastAPI backend
   ↓
@@ -19,7 +19,7 @@ Create a virtual environment and install dependencies:
 ```bash
 python -m venv .venv
 ./.venv/bin/python -m pip install -r backend/requirements.txt
-./.venv/bin/python -m pip install -r frontend/requirements.txt
+cd frontend && npm install
 ```
 
 Start the backend:
@@ -31,7 +31,7 @@ Start the backend:
 Start the dashboard:
 
 ```bash
-./.venv/bin/python -m streamlit run frontend/streamlit_app.py
+cd frontend && npm run dev
 ```
 
 Open `http://127.0.0.1:8501`.
@@ -41,9 +41,9 @@ Open `http://127.0.0.1:8501`.
 This repo includes a `render.yaml` Blueprint for deploying two Render web services:
 
 - `civicaid-etudiant-api`: FastAPI backend
-- `civicaid-etudiant-dashboard`: Streamlit dashboard
+- `civicaid-etudiant-dashboard`: React static site
 
-In Render, create a new Blueprint from this GitHub repo. The dashboard receives the backend private host and port through environment variables, so the Streamlit server can call the API without exposing an internal URL to the browser.
+In Render, create a new Blueprint from this GitHub repo. Set `VITE_CIVICAID_API_BASE_URL` on the dashboard service to the public FastAPI backend URL, for example `https://YOUR_BACKEND_SERVICE.onrender.com`.
 
 After deployment, configure your ElevenLabs agent server tools to call the public backend URL shown by Render, for example:
 
@@ -59,6 +59,8 @@ Do not commit real secrets. Use your hosting provider's environment-variable set
 ```text
 ELEVENLABS_AGENT_ID=agent_...
 CIVICAID_API_BASE_URL=https://YOUR_BACKEND_SERVICE.onrender.com
+VITE_CIVICAID_API_BASE_URL=https://YOUR_BACKEND_SERVICE.onrender.com
+VITE_ELEVENLABS_AGENT_ID=agent_...
 CIVICAID_TOOL_TOKEN=your-random-secret
 ```
 
@@ -68,7 +70,7 @@ CIVICAID_TOOL_TOKEN=your-random-secret
 X-CivicAid-Tool-Token: your-random-secret
 ```
 
-Set the same token in the Streamlit service environment so the dashboard can refresh profiles and generate roadmaps. Add the same header in ElevenLabs server tool configuration.
+Add the same header in ElevenLabs server tool configuration. Do not put private tokens in `VITE_*` variables because those are embedded into the browser bundle.
 
 ## Privacy
 
