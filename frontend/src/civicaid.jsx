@@ -154,7 +154,9 @@ async function apiRequest(path, options = {}) {
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`${response.status} ${response.statusText}: ${detail}`);
+    const error = new Error(`${response.status} ${response.statusText}: ${detail}`);
+    error.status = response.status;
+    throw error;
   }
 
   const text = await response.text();
@@ -590,10 +592,13 @@ export default function CivicAid() {
         const fetchedRoadmap = await generateRoadmap(STUDENT_ID);
         setRoadmap(fetchedRoadmap);
       } catch (event) {
-        setError(
-          "Could not load the profile yet. Complete the voice call, seed the demo roadmap, or check that FastAPI is running.",
-        );
-      } finally {
+        if (event.status === 404) {
+          setProfile(null);
+          setRoadmap(null);
+          return;
+        }
+
+        setError("Could not connect to the roadmap service. Please check that the backend is running.");
       }
     },
     [],
