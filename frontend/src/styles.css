@@ -108,7 +108,7 @@ button {
 .civicaid-app main {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 48px 32px 80px;
+  padding: 48px 32px 150px;
 }
 
 .landing-hero {
@@ -176,12 +176,14 @@ button {
 
 .voice-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
+  align-items: center;
+  gap: 32px;
   overflow: visible;
-  margin-bottom: 56px;
-  min-height: 330px;
-  padding: 34px 36px 34px;
+  margin-bottom: 44px;
+  min-height: auto;
+  padding: 34px 36px;
   border: 1px solid #eae9e2;
   border-radius: 24px;
   background: #ffffff;
@@ -246,23 +248,12 @@ button {
   line-height: 1.58;
 }
 
-.voice-widget-wrap {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 30px auto 0;
-  padding: 0;
-}
-
 .elevenlabs-widget-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 112px;
-  margin: 0;
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  transform: translateX(-50%);
 }
 
 .elevenlabs-widget-slot elevenlabs-convai {
@@ -274,6 +265,39 @@ button {
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
   color: #64748b;
+}
+
+.voice-card-aside {
+  position: relative;
+  z-index: 1;
+  padding: 22px 24px;
+  border: 1px solid #eae9e2;
+  border-radius: 18px;
+  background: #fafaf7;
+}
+
+.voice-card-aside span {
+  display: block;
+  margin-bottom: 12px;
+  color: #002395;
+  font-family: "Fraunces", serif;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.voice-card-aside strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.voice-card-aside p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .urgent-card button {
@@ -772,6 +796,7 @@ footer em {
 
 @media (max-width: 980px) {
   .hero-grid,
+  .voice-card,
   .metrics-panel {
     grid-template-columns: 1fr;
   }
@@ -794,7 +819,7 @@ footer em {
   }
 
   .civicaid-app main {
-    padding: 34px 16px 56px;
+    padding: 34px 16px 140px;
   }
 
   .voice-card,
@@ -805,12 +830,7 @@ footer em {
   }
 
   .voice-card {
-    min-height: 330px;
     margin-bottom: 56px;
-  }
-
-  .voice-widget-wrap {
-    margin-top: 24px;
   }
 
   .step-button {

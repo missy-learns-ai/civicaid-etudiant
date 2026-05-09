@@ -268,19 +268,14 @@ function VoiceSection({ hasProfile }) {
         </h2>
         <p>
           {hasProfile
-            ? "Update your situation, ask questions about any step, or clarify what to do next."
-            : "Start with a quick voice session. CivicAid Étudiant will turn your answers into a personalized administrative roadmap."}
+            ? "Use the floating voice button below to update your situation, ask questions about any step, or clarify what to do next."
+            : "Use the floating voice button below to start a quick session. CivicAid Étudiant will turn your answers into a personalized administrative roadmap."}
         </p>
       </div>
-      <div className="voice-widget-wrap">
-        <ElevenLabsWidget
-          agentId={ELEVENLABS_AGENT_ID}
-          dynamicVariables={{
-            student_id: STUDENT_ID,
-            api_base_url: API_BASE_URL,
-            product_context: "CivicAid Étudiant student dashboard",
-          }}
-        />
+      <div className="voice-card-aside">
+        <span>01</span>
+        <strong>Start the voice session</strong>
+        <p>The assistant will collect the basics, save your profile, and prepare the roadmap here.</p>
       </div>
     </section>
   );
@@ -621,6 +616,14 @@ export default function CivicAid() {
 
   return (
     <div className="civicaid-app">
+      <ElevenLabsWidget
+        agentId={ELEVENLABS_AGENT_ID}
+        dynamicVariables={{
+          student_id: STUDENT_ID,
+          api_base_url: API_BASE_URL,
+          product_context: "CivicAid Étudiant student dashboard",
+        }}
+      />
       <header className="topbar">
         <div>
           <div className="mini-flag">
