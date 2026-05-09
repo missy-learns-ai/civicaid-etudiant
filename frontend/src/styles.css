@@ -250,22 +250,22 @@ button {
 
 .elevenlabs-widget-slot {
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 34px;
   z-index: 60;
-  transform: translateX(-50%);
   display: flex;
   justify-content: center;
-  width: max-content;
-  max-width: calc(100vw - 32px);
+  width: 100%;
   min-height: 96px;
   overflow: visible;
+  pointer-events: none;
 }
 
 .elevenlabs-widget-slot elevenlabs-convai {
   display: block;
-  width: max-content;
   max-width: calc(100vw - 32px);
+  pointer-events: auto;
 }
 
 .soft-placeholder {
