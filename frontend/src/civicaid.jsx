@@ -275,7 +275,7 @@ function VoiceSection({ hasProfile }) {
       <div className="voice-card-aside">
         <span>01</span>
         <strong>Start the voice session</strong>
-        <p>The assistant will collect the basics, save your profile, and prepare the roadmap here.</p>
+        <p>Let's get to know you and we'll build your personalized roadmap.</p>
       </div>
     </section>
   );
