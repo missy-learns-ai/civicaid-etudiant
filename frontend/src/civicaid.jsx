@@ -196,7 +196,6 @@ function ElevenLabsWidget({ agentId, dynamicVariables }) {
         <elevenlabs-convai
           agent-id={agentId}
           dynamic-variables={JSON.stringify(dynamicVariables)}
-          override-first-message="Hi, I am CivicAid Étudiant. I can help organize your student administrative steps in France. Are you ready to begin?"
         />
       ) : (
         <div className="soft-placeholder">Voice assistant unavailable</div>
