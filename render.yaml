@@ -6,6 +6,10 @@ services:
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: civicaid-etudiant-db
+          property: connectionString
       - key: CIVICAID_TOOL_TOKEN
         sync: false
 
@@ -25,3 +29,9 @@ services:
         sync: false
       - key: VITE_ELEVENLABS_AGENT_ID
         sync: false
+
+databases:
+  - name: civicaid-etudiant-db
+    plan: free
+    databaseName: civicaid_etudiant
+    user: civicaid_etudiant

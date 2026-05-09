@@ -9,6 +9,8 @@ React dashboard
   ↓
 FastAPI backend
   ↓
+Postgres or SQLite storage
+  ↓
 StudentProfile + roadmap engine
 ```
 
@@ -45,6 +47,9 @@ This repo includes a `render.yaml` Blueprint for deploying two Render web servic
 
 In Render, create a new Blueprint from this GitHub repo. Set `VITE_CIVICAID_API_BASE_URL` on the dashboard service to the public FastAPI backend URL, for example `https://YOUR_BACKEND_SERVICE.onrender.com`.
 
+The backend persists profiles and call summaries through `DATABASE_URL`.
+The Render Blueprint creates `civicaid-etudiant-db` and wires its Postgres connection string into the API service. Local development falls back to SQLite at `./data/civicaid.db`.
+
 After deployment, configure your ElevenLabs agent server tools to call the public backend URL shown by Render, for example:
 
 ```text
@@ -62,6 +67,7 @@ CIVICAID_API_BASE_URL=https://YOUR_BACKEND_SERVICE.onrender.com
 VITE_CIVICAID_API_BASE_URL=https://YOUR_BACKEND_SERVICE.onrender.com
 VITE_ELEVENLABS_AGENT_ID=agent_...
 CIVICAID_TOOL_TOKEN=your-random-secret
+DATABASE_URL=postgresql://...
 ```
 
 `CIVICAID_TOOL_TOKEN` is optional. If set on the backend, all `/tools/*` and `/debug/*` calls must include:

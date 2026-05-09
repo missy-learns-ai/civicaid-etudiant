@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Dict, List, Optional
+from typing import Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,6 +24,14 @@ from backend.models.roadmap import (
 )
 from backend.services.deadline_calculator import calculate_renewal_window
 from backend.services.roadmap_engine import generate_arrival_roadmap_response
+from backend.storage import (
+    add_call_summary,
+    get_profile,
+    init_db,
+    list_call_summaries,
+    profile_exists,
+    save_profile,
+)
 
 
 app = FastAPI(
@@ -58,12 +66,9 @@ def verify_tool_token(
         raise HTTPException(status_code=401, detail="Invalid or missing tool token.")
 
 
-# ---------------------------------------------------------------------
-# In-memory storage for Phase 1
-# ---------------------------------------------------------------------
-
-STUDENT_PROFILES: Dict[str, StudentProfile] = {}
-CALL_SUMMARIES: List[dict] = []
+@app.on_event("startup")
+def startup() -> None:
+    init_db()
 
 
 # ---------------------------------------------------------------------
@@ -180,7 +185,7 @@ def apply_profile_patch(
     student_id: str,
     patch: StudentProfilePatch,
 ) -> StudentProfileUpdateResponse:
-    existing_profile = STUDENT_PROFILES.get(student_id)
+    existing_profile = get_profile(student_id)
 
     if existing_profile is None:
         existing_profile = StudentProfile(student_id=student_id)
@@ -220,7 +225,7 @@ def apply_profile_patch(
         if _is_unknown_value(getattr(updated_profile, field_name))
     ]
 
-    STUDENT_PROFILES[student_id] = updated_profile
+    save_profile(updated_profile)
 
     return StudentProfileUpdateResponse(
         student_id=student_id,
@@ -391,7 +396,7 @@ def generate_arrival_roadmap(
     priorities, renewal windows, and next actions.
     """
 
-    profile = STUDENT_PROFILES.get(request.student_id)
+    profile = get_profile(request.student_id)
 
     if profile is None:
         raise HTTPException(
@@ -440,23 +445,19 @@ def save_call_summary(
     """
     Store a short summary for the dashboard.
 
-    Phase 1 uses in-memory storage.
-    Later this should be persisted in a database.
+    Store a short summary in the configured database.
     """
 
-    if request.student_id not in STUDENT_PROFILES:
+    if not profile_exists(request.student_id):
         raise HTTPException(
             status_code=404,
             detail=f"No student profile found for student_id={request.student_id}.",
         )
 
-    CALL_SUMMARIES.append(
-        {
-            "student_id": request.student_id,
-            "conversation_id": request.conversation_id,
-            "summary": request.summary,
-            "saved_at": datetime.utcnow().isoformat(),
-        }
+    add_call_summary(
+        student_id=request.student_id,
+        conversation_id=request.conversation_id,
+        summary=request.summary,
     )
 
     return SaveCallSummaryResponse(
@@ -477,7 +478,7 @@ def get_debug_profile(
     student_id: str,
     _: None = Depends(verify_tool_token),
 ) -> DebugProfileResponse:
-    profile = STUDENT_PROFILES.get(student_id)
+    profile = get_profile(student_id)
 
     if profile is None:
         raise HTTPException(
@@ -495,7 +496,8 @@ def get_debug_profile(
 def get_debug_call_summaries(
     _: None = Depends(verify_tool_token),
 ):
+    items = list_call_summaries()
     return {
-        "count": len(CALL_SUMMARIES),
-        "items": CALL_SUMMARIES,
+        "count": len(items),
+        "items": items,
     }
