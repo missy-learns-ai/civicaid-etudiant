@@ -117,6 +117,12 @@ class DebugProfileResponse(BaseModel):
     profile: StudentProfile
 
 
+class ProfileStatusResponse(BaseModel):
+    student_id: str
+    exists: bool
+    profile: Optional[StudentProfile] = None
+
+
 class UpdateScopeProfileRequest(ToolBaseModel):
     student_id: str = "demo_001"
     nationality_category: Optional[NationalityCategory] = None
@@ -488,6 +494,22 @@ def get_debug_profile(
 
     return DebugProfileResponse(
         student_id=student_id,
+        profile=profile,
+    )
+
+
+@app.get(
+    "/debug/profile-status/{student_id}",
+    response_model=ProfileStatusResponse,
+)
+def get_profile_status(
+    student_id: str,
+    _: None = Depends(verify_tool_token),
+) -> ProfileStatusResponse:
+    profile = get_profile(student_id)
+    return ProfileStatusResponse(
+        student_id=student_id,
+        exists=profile is not None,
         profile=profile,
     )
 

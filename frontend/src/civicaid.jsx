@@ -164,7 +164,8 @@ async function apiRequest(path, options = {}) {
 }
 
 async function fetchProfile(studentId) {
-  const response = await apiRequest(`/debug/profile/${studentId}`);
+  const response = await apiRequest(`/debug/profile-status/${studentId}`);
+  if (!response.exists) return null;
   return response.profile || response;
 }
 
@@ -588,6 +589,12 @@ export default function CivicAid() {
       setError("");
       try {
         const fetchedProfile = await fetchProfile(STUDENT_ID);
+        if (!fetchedProfile) {
+          setProfile(null);
+          setRoadmap(null);
+          return;
+        }
+
         setProfile(fetchedProfile);
         const fetchedRoadmap = await generateRoadmap(STUDENT_ID);
         setRoadmap(fetchedRoadmap);
