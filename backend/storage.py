@@ -112,8 +112,6 @@ def init_db() -> None:
 def get_profile(student_id: str) -> Optional[StudentProfile]:
     with _connection() as connection:
         if _is_postgres():
-            from psycopg.types.json import Json
-
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT profile_json FROM student_profiles WHERE student_id = %s",
@@ -140,6 +138,8 @@ def save_profile(profile: StudentProfile) -> None:
 
     with _connection() as connection:
         if _is_postgres():
+            from psycopg.types.json import Json
+
             with connection.cursor() as cursor:
                 cursor.execute(
                     """
