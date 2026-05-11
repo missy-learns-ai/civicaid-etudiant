@@ -348,9 +348,11 @@ function StepCard({ step, index, expanded, onToggle }) {
   const config = statusConfig(step.status);
   const Icon = STEP_ICONS[step.step_id] || FileText;
   const sources = step.sources || [];
+  const displayNumber = String(index + 1).padStart(2, "0");
 
   return (
     <motion.article
+      id={`step-${step.step_id}`}
       className="roadmap-step"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -358,7 +360,7 @@ function StepCard({ step, index, expanded, onToggle }) {
       style={{ "--status-color": config.dot }}
     >
       <button onClick={onToggle} className="step-button">
-        <div className="step-index">{String(step.priority || index + 1).padStart(2, "0")}</div>
+        <div className="step-index">{displayNumber}</div>
         <div className="step-icon" style={{ background: config.bg, color: config.text }}>
           <Icon size={18} />
         </div>
@@ -501,7 +503,12 @@ function PopulatedState({ profile, roadmap, error }) {
             onClick={() => {
               setActiveTab("roadmap");
               setExpandedStep(topStep?.step_id);
-              document.getElementById("roadmap-anchor")?.scrollIntoView({ behavior: "smooth" });
+              window.setTimeout(() => {
+                const target = topStep?.step_id
+                  ? document.getElementById(`step-${topStep.step_id}`)
+                  : document.getElementById("roadmap-anchor");
+                target?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }, 80);
             }}
           >
             See full step
