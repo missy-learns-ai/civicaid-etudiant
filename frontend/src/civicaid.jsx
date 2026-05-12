@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Circle,
   Clock,
+  ExternalLink,
   FileText,
   Heart,
   Home,
@@ -399,6 +400,43 @@ function StepCard({ step, index, expanded, onToggle }) {
                       </small>
                     ))}
                   </div>
+                </div>
+              ) : null}
+              {step.guidance_cards?.length ? (
+                <div className="guidance-list">
+                  <span>Recommendations</span>
+                  {step.guidance_cards.map((card) => (
+                    <div className="guidance-card" key={card.id}>
+                      <h4>{card.title}</h4>
+                      <p>{card.why_it_matters}</p>
+                      {card.documents?.length ? (
+                        <div className="guidance-section">
+                          <strong>Documents to prepare</strong>
+                          <ul>
+                            {card.documents.map((document) => (
+                              <li key={document}>{document}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {card.suggested_actions?.length ? (
+                        <div className="guidance-section">
+                          <strong>Suggested actions</strong>
+                          <ul>
+                            {card.suggested_actions.map((action) => (
+                              <li key={action}>{action}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {card.source_url ? (
+                        <a href={card.source_url} target="_blank" rel="noreferrer">
+                          {card.source_title || "Official source"}
+                          <ExternalLink size={12} />
+                        </a>
+                      ) : null}
+                    </div>
+                  ))}
                 </div>
               ) : null}
               {sources.length ? (

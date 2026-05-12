@@ -18,7 +18,7 @@ from backend.app import (
     update_scope_profile,
     update_university_profile,
 )
-from backend.models.roadmap import GenerateArrivalRoadmapRequest
+from backend.models.roadmap import GenerateArrivalRoadmapRequest, RoadmapScope, RoadmapStepId
 
 
 def test_all_profile_update_tools_persist_and_generate_roadmap(tmp_path, monkeypatch):
@@ -97,6 +97,23 @@ def test_all_profile_update_tools_persist_and_generate_roadmap(tmp_path, monkeyp
     )
     assert roadmap_response.roadmap_status == "generated"
     assert len(roadmap_response.roadmap.steps) == 7
+
+    caf_response = generate_arrival_roadmap(
+        GenerateArrivalRoadmapRequest(
+            student_id=student_id,
+            roadmap_scope=RoadmapScope.CAF,
+        )
+    )
+    caf_step_ids = [step.step_id for step in caf_response.roadmap.steps]
+    bank_step = next(
+        step
+        for step in caf_response.roadmap.steps
+        if step.step_id == RoadmapStepId.BANK_RIB
+    )
+
+    assert RoadmapStepId.RESIDENCE_RENEWAL not in caf_step_ids
+    assert bank_step.guidance_cards
+    assert bank_step.guidance_cards[0].source_url == "https://www.campusfrance.org/en/organise-arrival-France"
 
     summary_response = save_call_summary(
         SaveCallSummaryRequest(

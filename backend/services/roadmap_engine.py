@@ -19,6 +19,7 @@ from backend.models.roadmap import (
 )
 
 from backend.services.deadline_calculator import calculate_renewal_window
+from backend.storage import get_guidance_cards
 
 
 def _has_university_proof(profile: StudentProfile) -> bool:
@@ -490,6 +491,20 @@ def sort_steps(steps: list[RoadmapStep]) -> list[RoadmapStep]:
     return sorted(steps, key=lambda step: step.priority)
 
 
+def attach_guidance_cards(
+    steps: list[RoadmapStep],
+    scope: RoadmapScope,
+) -> list[RoadmapStep]:
+    for step in steps:
+        step.guidance_cards = get_guidance_cards(
+            step_id=step.step_id.value,
+            blocker_keys=step.blocking_items,
+            scope=scope.value,
+        )
+
+    return steps
+
+
 def scope_steps(steps: list[RoadmapStep], scope: RoadmapScope) -> list[RoadmapStep]:
     if scope == RoadmapScope.FULL:
         return steps
@@ -646,7 +661,7 @@ def generate_arrival_roadmap(
         build_residence_renewal_step(profile),
     ]
 
-    steps = sort_steps(scope_steps(steps, scope))
+    steps = attach_guidance_cards(sort_steps(scope_steps(steps, scope)), scope)
     summary = build_summary(steps, scope)
     title = "Your Non-EU Student Arrival Roadmap"
     if scope == RoadmapScope.CAF:

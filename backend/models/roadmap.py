@@ -49,6 +49,27 @@ class SourceReference(BaseModel):
     url: Optional[str] = None
 
 
+class GuidanceCard(BaseModel):
+    """
+    Recommendation content attached to roadmap steps from the guidance database.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    step_id: RoadmapStepId
+    blocker_key: Optional[str] = None
+    scope: RoadmapScope = RoadmapScope.FULL
+    title: str
+    why_it_matters: str
+    documents: List[str] = Field(default_factory=list)
+    suggested_actions: List[str] = Field(default_factory=list)
+    source_title: Optional[str] = None
+    source_url: Optional[str] = None
+    priority: int = 100
+    locale: str = "en"
+
+
 class RoadmapStep(BaseModel):
     """
     One step in the student's arrival roadmap.
@@ -76,6 +97,7 @@ class RoadmapStep(BaseModel):
 
     source_ids: List[str] = Field(default_factory=list)
     sources: List[SourceReference] = Field(default_factory=list)
+    guidance_cards: List[GuidanceCard] = Field(default_factory=list)
 
     confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM
 
