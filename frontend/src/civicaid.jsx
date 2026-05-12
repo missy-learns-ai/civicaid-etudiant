@@ -390,22 +390,9 @@ function StepCard({ step, index, expanded, onToggle }) {
                 <span>Next action</span>
                 <strong>{step.next_action}</strong>
               </div>
-              {step.blocking_items?.length ? (
-                <div className="blockers">
-                  <span>Blockers</span>
-                  <div>
-                    {step.blocking_items.map((blocker) => (
-                      <small key={blocker}>
-                        <AlertCircle size={12} />
-                        {BLOCKER_COPY[blocker] || formatValue(blocker)}
-                      </small>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
               {step.guidance_cards?.length ? (
                 <div className="guidance-list">
-                  <span>Recommendations</span>
+                  <span>Practical guidance</span>
                   {step.guidance_cards.map((card) => (
                     <div className="guidance-card" key={card.id}>
                       <h4>{card.title}</h4>
@@ -438,6 +425,19 @@ function StepCard({ step, index, expanded, onToggle }) {
                       ) : null}
                     </div>
                   ))}
+                </div>
+              ) : null}
+              {step.blocking_items?.length ? (
+                <div className="blockers">
+                  <span>Blockers</span>
+                  <div>
+                    {step.blocking_items.map((blocker) => (
+                      <small key={blocker}>
+                        <AlertCircle size={12} />
+                        {BLOCKER_COPY[blocker] || formatValue(blocker)}
+                      </small>
+                    ))}
+                  </div>
                 </div>
               ) : null}
               {sources.length ? (
