@@ -64,6 +64,10 @@ def test_demo_student_profile_generates_expected_roadmap():
     assert "rib_missing" in caf_step.blocking_items
     assert "rental_contract_missing" in caf_step.blocking_items
 
+    bank_step = get_step(roadmap, RoadmapStepId.BANK_RIB)
+    assert bank_step.status == RoadmapStatus.BLOCKED
+    assert "bank_account_missing" in bank_step.blocking_items
+
     renewal_step = get_step(roadmap, RoadmapStepId.RESIDENCE_RENEWAL)
     assert renewal_step.status == RoadmapStatus.FUTURE
     assert renewal_step.renewal_window_start == date(2027, 5, 9)

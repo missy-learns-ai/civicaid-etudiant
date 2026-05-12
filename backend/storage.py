@@ -489,6 +489,7 @@ def get_guidance_cards(
     locale: str = "en",
 ) -> list[GuidanceCard]:
     blocker_keys = blocker_keys or []
+    contextual_scope = "caf" if scope == "full" else scope
 
     with _connection() as connection:
         if _is_postgres():
@@ -506,7 +507,7 @@ def get_guidance_cards(
                         AND scope IN (%s, 'full')
                     ORDER BY priority ASC, id ASC
                     """,
-                    (step_id, locale, scope),
+                    (step_id, locale, contextual_scope),
                 )
                 rows = cursor.fetchall()
                 raw_cards = [
@@ -541,7 +542,7 @@ def get_guidance_cards(
                         AND scope IN (?, 'full')
                     ORDER BY priority ASC, id ASC
                     """,
-                    (step_id, locale, scope),
+                    (step_id, locale, contextual_scope),
                 ).fetchall()
             except sqlite3.OperationalError as exc:
                 if "no such table" in str(exc):

@@ -97,6 +97,13 @@ def test_all_profile_update_tools_persist_and_generate_roadmap(tmp_path, monkeyp
     )
     assert roadmap_response.roadmap_status == "generated"
     assert len(roadmap_response.roadmap.steps) == 7
+    full_bank_step = next(
+        step
+        for step in roadmap_response.roadmap.steps
+        if step.step_id == RoadmapStepId.BANK_RIB
+    )
+    assert full_bank_step.guidance_cards
+    assert full_bank_step.guidance_cards[0].blocker_key == "bank_account_missing"
 
     caf_response = generate_arrival_roadmap(
         GenerateArrivalRoadmapRequest(
