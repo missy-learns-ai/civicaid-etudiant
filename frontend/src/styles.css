@@ -251,13 +251,13 @@ button {
 .elevenlabs-widget-slot {
   position: fixed;
   left: 50%;
-  bottom: 34px;
+  bottom: 22px;
   z-index: 60;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  width: min(560px, calc(100vw - 24px));
-  min-height: 150px;
+  width: min(640px, calc(100vw - 20px));
+  height: 230px;
   overflow: visible;
   pointer-events: none;
   transform: translateX(-50%);
@@ -265,9 +265,9 @@ button {
 
 .elevenlabs-widget-slot elevenlabs-convai {
   display: block;
-  width: min(560px, calc(100vw - 24px));
+  width: min(640px, calc(100vw - 20px));
   max-width: 100%;
-  min-height: 132px;
+  height: 220px;
   overflow: visible;
   pointer-events: auto;
 }
