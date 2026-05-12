@@ -14,6 +14,7 @@ from backend.models.roadmap import (
     RoadmapStep,
     RoadmapStatus,
     RoadmapStepId,
+    RoadmapScope,
     GenerateArrivalRoadmapResponse,
 )
 
@@ -489,6 +490,39 @@ def sort_steps(steps: list[RoadmapStep]) -> list[RoadmapStep]:
     return sorted(steps, key=lambda step: step.priority)
 
 
+def scope_steps(steps: list[RoadmapStep], scope: RoadmapScope) -> list[RoadmapStep]:
+    if scope == RoadmapScope.FULL:
+        return steps
+
+    if scope == RoadmapScope.CAF:
+        step_by_id = {step.step_id: step for step in steps}
+        scoped_ids = [
+            RoadmapStepId.VLS_TS_VALIDATION,
+            RoadmapStepId.AMELI_REGISTRATION,
+            RoadmapStepId.BANK_RIB,
+            RoadmapStepId.HOUSING_SETUP,
+            RoadmapStepId.CAF_HIGH_LEVEL,
+        ]
+        scoped_steps = [
+            step_by_id[step_id]
+            for step_id in scoped_ids
+            if step_id in step_by_id
+        ]
+
+        ameli_step = step_by_id.get(RoadmapStepId.AMELI_REGISTRATION)
+        university_step = step_by_id.get(RoadmapStepId.CVEC_UNIVERSITY_REGISTRATION)
+        if (
+            ameli_step
+            and university_step
+            and "certificat_scolarite_missing" in ameli_step.blocking_items
+        ):
+            scoped_steps.insert(1, university_step)
+
+        return scoped_steps
+
+    return steps
+
+
 def determine_top_priority(steps: list[RoadmapStep]) -> RoadmapStepId | None:
     actionable_statuses = {
         RoadmapStatus.URGENT,
@@ -528,10 +562,26 @@ def determine_overall_status(steps: list[RoadmapStep]) -> RoadmapStatus:
     return RoadmapStatus.UNKNOWN
 
 
-def collect_unknowns(profile: StudentProfile) -> list[str]:
+def collect_unknowns(profile: StudentProfile, scope: RoadmapScope) -> list[str]:
     unknowns = []
 
-    for field_name in profile.required_phase_1_fields():
+    if scope == RoadmapScope.CAF:
+        field_names = [
+            "nationality_category",
+            "country",
+            "visa_validated",
+            "ameli_registered",
+            "has_bank_account",
+            "has_rib",
+            "housing_status",
+            "has_permanent_housing",
+            "has_rental_contract",
+            "wants_caf",
+        ]
+    else:
+        field_names = profile.required_phase_1_fields()
+
+    for field_name in field_names:
         value = getattr(profile, field_name)
 
         if value is None:
@@ -544,10 +594,22 @@ def collect_unknowns(profile: StudentProfile) -> list[str]:
     return unknowns
 
 
-def build_summary(steps: list[RoadmapStep]) -> str:
+def build_summary(steps: list[RoadmapStep], scope: RoadmapScope) -> str:
     urgent_steps = [step for step in steps if step.status == RoadmapStatus.URGENT]
     blocked_steps = [step for step in steps if step.status == RoadmapStatus.BLOCKED]
     ready_steps = [step for step in steps if step.status == RoadmapStatus.READY]
+
+    if scope == RoadmapScope.CAF:
+        if blocked_steps:
+            return (
+                f"Your CAF roadmap has {len(blocked_steps)} blocked prerequisite(s). "
+                f"Start with: {blocked_steps[0].title}."
+            )
+
+        if ready_steps:
+            return "Your CAF prerequisites look ready. Review the CAF step and verify details on official websites."
+
+        return "Your CAF-focused roadmap has been generated. Review each prerequisite before applying."
 
     if urgent_steps:
         return (
@@ -570,7 +632,10 @@ def build_summary(steps: list[RoadmapStep]) -> str:
     return "Your roadmap has been generated. Review each step and verify important information on official websites."
 
 
-def generate_arrival_roadmap(profile: StudentProfile) -> ArrivalRoadmap:
+def generate_arrival_roadmap(
+    profile: StudentProfile,
+    scope: RoadmapScope = RoadmapScope.FULL,
+) -> ArrivalRoadmap:
     steps = [
         build_vls_ts_step(profile),
         build_university_step(profile),
@@ -581,24 +646,30 @@ def generate_arrival_roadmap(profile: StudentProfile) -> ArrivalRoadmap:
         build_residence_renewal_step(profile),
     ]
 
-    steps = sort_steps(steps)
-    summary = build_summary(steps)
+    steps = sort_steps(scope_steps(steps, scope))
+    summary = build_summary(steps, scope)
+    title = "Your Non-EU Student Arrival Roadmap"
+    if scope == RoadmapScope.CAF:
+        title = "Your CAF Housing Aid Roadmap"
 
     return ArrivalRoadmap(
         roadmap_id=f"roadmap_{profile.student_id}_{uuid4().hex[:8]}",
         student_id=profile.student_id,
+        scope=scope,
+        title=title,
         summary=summary,
         steps=steps,
         top_priority_step_id=determine_top_priority(steps),
         overall_status=determine_overall_status(steps),
-        unknowns_to_resolve=collect_unknowns(profile),
+        unknowns_to_resolve=collect_unknowns(profile, scope),
     )
 
 
 def generate_arrival_roadmap_response(
     profile: StudentProfile,
+    scope: RoadmapScope = RoadmapScope.FULL,
 ) -> GenerateArrivalRoadmapResponse:
-    roadmap = generate_arrival_roadmap(profile)
+    roadmap = generate_arrival_roadmap(profile, scope)
 
     top_priority = None
     if roadmap.top_priority_step_id:

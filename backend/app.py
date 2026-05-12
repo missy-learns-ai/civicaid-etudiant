@@ -413,7 +413,7 @@ def generate_arrival_roadmap(
             ),
         )
 
-    return generate_arrival_roadmap_response(profile)
+    return generate_arrival_roadmap_response(profile, request.roadmap_scope)
 
 
 # ---------------------------------------------------------------------

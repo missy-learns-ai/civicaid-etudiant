@@ -2,6 +2,7 @@ from datetime import date
 
 from backend.models.roadmap import (
     GenerateArrivalRoadmapRequest,
+    RoadmapScope,
     RenewalWindowRequest,
 )
 from backend.models.student_profile import (
@@ -83,6 +84,18 @@ def test_generate_roadmap_defaults_demo_student_and_ignores_metadata():
     )
 
     assert request.student_id == "demo_001"
+
+
+def test_generate_roadmap_accepts_scope():
+    request = GenerateArrivalRoadmapRequest.model_validate(
+        {
+            "student_id": "demo_caf_scope",
+            "roadmap_scope": "CAF",
+        }
+    )
+
+    assert request.student_id == "demo_caf_scope"
+    assert request.roadmap_scope == RoadmapScope.CAF
 
 
 def test_renewal_window_ignores_metadata():

@@ -8,7 +8,7 @@ from backend.models.student_profile import (
     HousingStatus,
 )
 
-from backend.models.roadmap import RoadmapStatus, RoadmapStepId
+from backend.models.roadmap import RoadmapScope, RoadmapStatus, RoadmapStepId
 
 from backend.services.roadmap_engine import generate_arrival_roadmap
 from backend.services.deadline_calculator import calculate_renewal_window
@@ -132,6 +132,43 @@ def test_caf_ready_when_basic_items_exist():
 
     assert caf_step.status == RoadmapStatus.READY
     assert caf_step.blocking_items == []
+
+
+def test_caf_scoped_roadmap_excludes_renewal_and_keeps_prerequisites():
+    profile = StudentProfile(
+        student_id="demo_caf_scope",
+        nationality_category=NationalityCategory.NON_EU,
+        country="Nepal",
+        has_arrived=True,
+        arrival_date=date(2026, 9, 10),
+        visa_type=VisaType.VLS_TS_STUDENT,
+        visa_validated=True,
+        visa_expiry_date=None,
+        has_french_address=True,
+        cvec_status=BasicStatus.DONE,
+        university_registration_status=BasicStatus.DONE,
+        has_certificat_scolarite=True,
+        has_student_card=True,
+        ameli_registered=True,
+        has_bank_account=False,
+        has_rib=False,
+        housing_status=HousingStatus.TEMPORARY,
+        has_permanent_housing=False,
+        has_rental_contract=False,
+        wants_caf=True,
+    )
+
+    roadmap = generate_arrival_roadmap(profile, scope=RoadmapScope.CAF)
+    step_ids = [step.step_id for step in roadmap.steps]
+
+    assert roadmap.scope == RoadmapScope.CAF
+    assert roadmap.title == "Your CAF Housing Aid Roadmap"
+    assert RoadmapStepId.CAF_HIGH_LEVEL in step_ids
+    assert RoadmapStepId.BANK_RIB in step_ids
+    assert RoadmapStepId.HOUSING_SETUP in step_ids
+    assert RoadmapStepId.RESIDENCE_RENEWAL not in step_ids
+    assert "visa_expiry_date" not in roadmap.unknowns_to_resolve
+    assert roadmap.top_priority_step_id == RoadmapStepId.BANK_RIB
 
 
 def test_renewal_window_calculation():

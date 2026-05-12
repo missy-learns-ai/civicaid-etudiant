@@ -31,6 +31,11 @@ class RoadmapStepId(NormalizedStrEnum):
     RESIDENCE_RENEWAL = "residence_renewal"
 
 
+class RoadmapScope(NormalizedStrEnum):
+    FULL = "full"
+    CAF = "caf"
+
+
 class SourceReference(BaseModel):
     """
     Reference to an official source from source_registry.csv.
@@ -84,6 +89,7 @@ class ArrivalRoadmap(BaseModel):
 
     roadmap_id: str
     student_id: str
+    scope: RoadmapScope = RoadmapScope.FULL
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
     title: str = "Your Non-EU Student Arrival Roadmap"
@@ -109,6 +115,7 @@ class GenerateArrivalRoadmapRequest(ToolRequestModel):
     """
 
     student_id: str = "demo_001"
+    roadmap_scope: RoadmapScope = RoadmapScope.FULL
 
 
 class GenerateArrivalRoadmapResponse(BaseModel):
