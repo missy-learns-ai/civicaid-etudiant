@@ -61,7 +61,7 @@ To prefill the ElevenLabs widget agent:
 VITE_ELEVENLABS_AGENT_ID=agent_xxx npm run dev
 ```
 
-The default local agent id is `agent_0301kqspeqntenb8stq8k9nnwc5q`.
+No agent id is hardcoded in the dashboard. Set `VITE_ELEVENLABS_AGENT_ID` locally or in your hosting provider.
 
 Do not put private API keys or tokens in `VITE_*` variables. Vite embeds those values into the browser bundle.
 

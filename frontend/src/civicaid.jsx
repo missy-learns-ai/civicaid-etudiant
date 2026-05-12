@@ -19,8 +19,7 @@ import {
 } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_CIVICAID_API_BASE_URL || "http://127.0.0.1:8000";
-const ELEVENLABS_AGENT_ID =
-  import.meta.env.VITE_ELEVENLABS_AGENT_ID || "agent_0301kqspeqntenb8stq8k9nnwc5q";
+const ELEVENLABS_AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID || "";
 const STUDENT_ID = import.meta.env.VITE_CIVICAID_STUDENT_ID || "demo_001";
 const DEMO_PRELOADED = import.meta.env.VITE_DEMO_PRELOADED === "true";
 const FORCE_LANDING_PAGE = import.meta.env.VITE_FORCE_LANDING_PAGE === "true";
