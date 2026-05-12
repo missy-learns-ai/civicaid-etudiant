@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -117,6 +117,18 @@ const DEMO_ROADMAP = {
 
 function normalizeRoadmap(response) {
   return response?.roadmap || response || null;
+}
+
+function profileFingerprint(profile) {
+  if (!profile) return "";
+
+  const {
+    updated_at: _updatedAt,
+    created_at: _createdAt,
+    ...stableProfile
+  } = profile;
+
+  return JSON.stringify(stableProfile);
 }
 
 function statusConfig(status) {
@@ -621,44 +633,56 @@ export default function CivicAid() {
   const [profile, setProfile] = useState(DEMO_PRELOADED ? DEMO_PROFILE : null);
   const [roadmap, setRoadmap] = useState(DEMO_PRELOADED ? DEMO_ROADMAP : null);
   const [error, setError] = useState("");
+  const profileFingerprintRef = useRef("");
+  const refreshInFlightRef = useRef(false);
 
   const hasData = Boolean(profile && roadmap?.steps?.length);
 
   const refresh = useMemo(
     () => async () => {
+      if (refreshInFlightRef.current) return;
+
+      refreshInFlightRef.current = true;
       setError("");
       try {
         const fetchedProfile = await fetchProfile(STUDENT_ID);
         if (!fetchedProfile) {
           setProfile(null);
           setRoadmap(null);
+          profileFingerprintRef.current = "";
           return;
         }
 
+        const nextFingerprint = profileFingerprint(fetchedProfile);
         setProfile(fetchedProfile);
-        const fetchedRoadmap = await generateRoadmap(STUDENT_ID);
-        setRoadmap(fetchedRoadmap);
+
+        if (!roadmap?.steps?.length || nextFingerprint !== profileFingerprintRef.current) {
+          const fetchedRoadmap = await generateRoadmap(STUDENT_ID);
+          setRoadmap(fetchedRoadmap);
+          profileFingerprintRef.current = nextFingerprint;
+        }
       } catch (event) {
         if (event.status === 404) {
           setProfile(null);
           setRoadmap(null);
+          profileFingerprintRef.current = "";
           return;
         }
 
         setError("Could not connect to the roadmap service. Please check that the backend is running.");
+      } finally {
+        refreshInFlightRef.current = false;
       }
     },
-    [],
+    [roadmap?.steps?.length],
   );
 
   useEffect(() => {
     if (DEMO_PRELOADED || FORCE_LANDING_PAGE) return undefined;
     refresh();
-    const interval = window.setInterval(() => {
-      if (!profile) refresh();
-    }, 8000);
+    const interval = window.setInterval(refresh, 15000);
     return () => window.clearInterval(interval);
-  }, [profile, refresh]);
+  }, [refresh]);
 
   return (
     <div className="civicaid-app">
