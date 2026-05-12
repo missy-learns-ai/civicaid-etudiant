@@ -256,8 +256,8 @@ button {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  width: min(640px, calc(100vw - 20px));
-  height: 230px;
+  width: auto;
+  height: auto;
   overflow: visible;
   pointer-events: none;
   transform: translateX(-50%);
@@ -265,9 +265,9 @@ button {
 
 .elevenlabs-widget-slot elevenlabs-convai {
   display: block;
-  width: min(640px, calc(100vw - 20px));
-  max-width: 100%;
-  height: 220px;
+  width: auto;
+  height: auto;
+  max-width: none;
   overflow: visible;
   pointer-events: auto;
 }
