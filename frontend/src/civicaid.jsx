@@ -191,7 +191,7 @@ function ElevenLabsWidget({ agentId, dynamicVariables }) {
   }, []);
 
   return (
-    <div className="elevenlabs-widget-slot">
+    <>
       {agentId ? (
         <elevenlabs-convai
           agent-id={agentId}
@@ -200,7 +200,7 @@ function ElevenLabsWidget({ agentId, dynamicVariables }) {
       ) : (
         <div className="soft-placeholder">Voice assistant unavailable</div>
       )}
-    </div>
+    </>
   );
 }
 
