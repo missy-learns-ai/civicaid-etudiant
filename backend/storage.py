@@ -13,7 +13,16 @@ from backend.models.student_profile import StudentProfile
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/civicaid.db")
 
 
-CAMPUS_FRANCE_ARRIVAL_URL = "https://www.campusfrance.org/en/organise-arrival-France"
+CAMPUS_FRANCE_BANK_URL = "https://www.campusfrance.org/en/getting-a-bank-account"
+CAF_STUDENT_HOUSING_AID_URL = (
+    "https://www.caf.fr/allocataires/actualites/actualites-nationales/"
+    "etudiants-tout-savoir-sur-l-aide-au-logement-0"
+)
+AMELI_FOREIGN_STUDENTS_URL = (
+    "https://www.ameli.fr/assure/droits-demarches/etudes-stages/etudiant/"
+    "french-social-security-registration-process-foreign-students"
+)
+SERVICE_PUBLIC_VLS_TS_VALIDATION_URL = "https://www.service-public.gouv.fr/particuliers/vosdroits/R52684"
 
 GUIDANCE_CARD_SEEDS = [
     {
@@ -38,8 +47,8 @@ GUIDANCE_CARD_SEEDS = [
             "Compare account fees before choosing a bank.",
             "If a bank refuses to open an account, check the Banque de France right-to-account process.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "Campus France - Getting a bank account",
+        "source_url": CAMPUS_FRANCE_BANK_URL,
         "priority": 10,
         "locale": "en",
         "active": True,
@@ -59,8 +68,8 @@ GUIDANCE_CARD_SEEDS = [
             "Ask your bank branch for a RIB if it is not visible online.",
             "Do not share your IBAN or full bank details with this assistant.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "Campus France - Getting a bank account",
+        "source_url": CAMPUS_FRANCE_BANK_URL,
         "priority": 20,
         "locale": "en",
         "active": True,
@@ -79,8 +88,8 @@ GUIDANCE_CARD_SEEDS = [
             "Finish the bank/RIB step before spending time on the CAF form.",
             "Keep a digital copy of your RIB ready for uploads or form entry.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "CAF - Students: housing aid",
+        "source_url": CAF_STUDENT_HOUSING_AID_URL,
         "priority": 10,
         "locale": "en",
         "active": True,
@@ -103,8 +112,8 @@ GUIDANCE_CARD_SEEDS = [
             "Check that your name, address, dates, and rent details are clear on the document.",
             "Keep a digital copy ready before starting a CAF file.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "CAF - Students: housing aid",
+        "source_url": CAF_STUDENT_HOUSING_AID_URL,
         "priority": 20,
         "locale": "en",
         "active": True,
@@ -124,8 +133,8 @@ GUIDANCE_CARD_SEEDS = [
             "Ask your school housing office or international office about student residences and partner housing options.",
             "Once housing is confirmed, request a written contract or certificate immediately.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "CAF - Students: housing aid",
+        "source_url": CAF_STUDENT_HOUSING_AID_URL,
         "priority": 10,
         "locale": "en",
         "active": True,
@@ -151,8 +160,8 @@ GUIDANCE_CARD_SEEDS = [
             "Save the confirmation after validation.",
             "Keep the confirmation available for future administrative steps.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "Service-Public - VLS-TS validation online",
+        "source_url": SERVICE_PUBLIC_VLS_TS_VALIDATION_URL,
         "priority": 10,
         "locale": "en",
         "active": True,
@@ -178,8 +187,8 @@ GUIDANCE_CARD_SEEDS = [
             "Prepare digital copies before starting the health insurance registration.",
             "Keep your provisional certificate once the process starts.",
         ],
-        "source_title": "Campus France - Organise your arrival in France",
-        "source_url": CAMPUS_FRANCE_ARRIVAL_URL,
+        "source_title": "Ameli - Social security registration for foreign students",
+        "source_url": AMELI_FOREIGN_STUDENTS_URL,
         "priority": 10,
         "locale": "en",
         "active": True,

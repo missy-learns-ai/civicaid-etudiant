@@ -113,7 +113,15 @@ def test_all_profile_update_tools_persist_and_generate_roadmap(tmp_path, monkeyp
 
     assert RoadmapStepId.RESIDENCE_RENEWAL not in caf_step_ids
     assert bank_step.guidance_cards
-    assert bank_step.guidance_cards[0].source_url == "https://www.campusfrance.org/en/organise-arrival-France"
+    assert bank_step.guidance_cards[0].source_url == "https://www.campusfrance.org/en/getting-a-bank-account"
+
+    caf_step = next(
+        step
+        for step in caf_response.roadmap.steps
+        if step.step_id == RoadmapStepId.CAF_HIGH_LEVEL
+    )
+    assert caf_step.guidance_cards
+    assert "caf.fr" in caf_step.guidance_cards[0].source_url
 
     summary_response = save_call_summary(
         SaveCallSummaryRequest(
