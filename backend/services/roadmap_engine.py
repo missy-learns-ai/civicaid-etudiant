@@ -287,6 +287,40 @@ def build_bank_rib_step(profile: StudentProfile) -> RoadmapStep:
             confidence=ConfidenceLevel.MEDIUM,
         )
 
+    if profile.has_bank_account is False:
+        blockers = ["bank_account_missing"]
+        if profile.has_rib is False:
+            blockers.append("rib_missing")
+
+        if profile.has_french_address is True and _has_university_proof(profile):
+            explanation = (
+                "You have the basic documents often needed to open a bank account, "
+                "but the account and RIB still need to be created."
+            )
+            next_action = (
+                "Prepare identification, proof of residence, and your certificat de scolarité "
+                "or student card, then book a bank appointment or ask your school about partner banks."
+            )
+            confidence = ConfidenceLevel.MEDIUM
+        else:
+            explanation = "Opening a bank account may be harder until you have proof of residence and enrollment evidence."
+            next_action = "Prepare identification, proof of residence, and proof of enrollment or student card. If you lack permanent housing, ask your institution whether its international office address can be used temporarily."
+            blockers.append("proof_of_residence_or_enrollment_missing")
+            confidence = ConfidenceLevel.LOW
+
+        return _make_step(
+            step_id=RoadmapStepId.BANK_RIB,
+            title="Open bank account and get RIB",
+            status=RoadmapStatus.BLOCKED,
+            priority=4,
+            explanation=explanation,
+            next_action=next_action,
+            blocking_items=blockers,
+            dependencies=[RoadmapStepId.CVEC_UNIVERSITY_REGISTRATION],
+            source_ids=["campus_france_bank"],
+            confidence=confidence,
+        )
+
     if profile.has_french_address is True and _has_university_proof(profile):
         return _make_step(
             step_id=RoadmapStepId.BANK_RIB,

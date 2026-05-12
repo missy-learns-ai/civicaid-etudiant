@@ -170,6 +170,11 @@ def test_caf_scoped_roadmap_excludes_renewal_and_keeps_prerequisites():
     assert "visa_expiry_date" not in roadmap.unknowns_to_resolve
     assert roadmap.top_priority_step_id == RoadmapStepId.BANK_RIB
 
+    bank_step = get_step(roadmap, RoadmapStepId.BANK_RIB)
+    assert bank_step.status == RoadmapStatus.BLOCKED
+    assert "bank_account_missing" in bank_step.blocking_items
+    assert "rib_missing" in bank_step.blocking_items
+
 
 def test_renewal_window_calculation():
     start, end = calculate_renewal_window(date(2027, 9, 30))

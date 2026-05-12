@@ -28,7 +28,7 @@ GUIDANCE_CARD_SEEDS = [
     {
         "id": "bank_account_missing_campus_france",
         "step_id": "bank_rib",
-        "blocker_key": "proof_of_residence_or_enrollment_missing",
+        "blocker_key": "bank_account_missing",
         "scope": "caf",
         "title": "Prepare for a French bank appointment",
         "why_it_matters": (

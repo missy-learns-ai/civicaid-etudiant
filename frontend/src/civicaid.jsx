@@ -74,6 +74,7 @@ const BLOCKER_COPY = {
   cvec_attestation_missing: "CVEC attestation needed",
   vls_ts_validation_or_residence_documentation: "Awaiting visa validation",
   certificat_scolarite_missing: "Enrollment certificate needed",
+  bank_account_missing: "Bank account needed",
   proof_of_residence_or_enrollment_missing: "Need address and enrollment proof",
   permanent_housing_missing: "Need permanent housing",
   rib_missing: "Need RIB / bank details",
