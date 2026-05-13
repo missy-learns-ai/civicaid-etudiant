@@ -210,7 +210,7 @@ async function apiRequest(path, options = {}) {
 }
 
 async function fetchProfile(studentId) {
-  const response = await apiRequest(`/debug/profile-status/${studentId}`);
+  const response = await apiRequest(`/public/profile-status/${studentId}`);
   if (!response.exists) return null;
   return response.profile || response;
 }
@@ -220,13 +220,8 @@ function inferRoadmapScope(profile) {
 }
 
 async function generateRoadmap(studentId, profile) {
-  const response = await apiRequest("/tools/generate-arrival-roadmap", {
-    method: "POST",
-    body: JSON.stringify({
-      student_id: studentId,
-      roadmap_scope: inferRoadmapScope(profile),
-    }),
-  });
+  const scope = inferRoadmapScope(profile);
+  const response = await apiRequest(`/public/roadmap/${studentId}?roadmap_scope=${encodeURIComponent(scope)}`);
   return normalizeRoadmap(response);
 }
 

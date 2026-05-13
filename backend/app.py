@@ -19,6 +19,7 @@ from backend.models.student_profile import (
 from backend.models.roadmap import (
     GenerateArrivalRoadmapRequest,
     GenerateArrivalRoadmapResponse,
+    RoadmapScope,
     RenewalWindowRequest,
     RenewalWindowResponse,
 )
@@ -45,7 +46,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -245,6 +246,21 @@ def health_check():
         "service": "civicaid-etudiant-backend",
         "version": "0.1.0",
     }
+
+
+@app.get(
+    "/public/profile-status/{student_id}",
+    response_model=ProfileStatusResponse,
+)
+def get_public_profile_status(
+    student_id: str,
+) -> ProfileStatusResponse:
+    profile = get_profile(student_id)
+    return ProfileStatusResponse(
+        student_id=student_id,
+        exists=profile is not None,
+        profile=profile,
+    )
 
 
 # ---------------------------------------------------------------------
@@ -487,6 +503,27 @@ def generate_arrival_roadmap(
         save_profile(profile)
 
     return generate_arrival_roadmap_response(profile, request.roadmap_scope)
+
+
+@app.get(
+    "/public/roadmap/{student_id}",
+    response_model=GenerateArrivalRoadmapResponse,
+)
+def get_public_roadmap(
+    student_id: str,
+    roadmap_scope: RoadmapScope = RoadmapScope.FULL,
+) -> GenerateArrivalRoadmapResponse:
+    profile = get_profile(student_id)
+
+    if profile is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No student profile found for student_id={student_id}."
+            ),
+        )
+
+    return generate_arrival_roadmap_response(profile, roadmap_scope)
 
 
 # ---------------------------------------------------------------------

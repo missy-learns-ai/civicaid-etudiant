@@ -524,7 +524,7 @@ Create a virtual environment and install dependencies:
 
 ```bash
 python -m venv .venv
-./.venv/bin/python -m pip install -r backend/requirements.txt
+./.venv/bin/python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt
 ```
 
 Start the backend:
