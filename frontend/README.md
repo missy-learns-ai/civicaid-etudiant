@@ -63,6 +63,8 @@ VITE_ELEVENLABS_AGENT_ID=agent_xxx npm run dev
 
 No agent id is hardcoded in the dashboard. Set `VITE_ELEVENLABS_AGENT_ID` locally or in your hosting provider.
 
+The dashboard creates a browser-local student id by default. Set `VITE_CIVICAID_STUDENT_ID=demo_001` only when you intentionally want to test against a fixed profile. To reset the current browser to a fresh generated profile, open the dashboard with `?new_student=1`.
+
 Do not put private API keys or tokens in `VITE_*` variables. Vite embeds those values into the browser bundle.
 
 ## ElevenLabs widget

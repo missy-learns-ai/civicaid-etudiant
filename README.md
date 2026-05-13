@@ -587,10 +587,12 @@ VITE_ELEVENLABS_AGENT_ID=agent_...
 Optional local/demo controls:
 
 ```text
-VITE_CIVICAID_STUDENT_ID=demo_001
+VITE_CIVICAID_STUDENT_ID=demo_001 # optional fixed test profile; omit in production for per-browser student ids
 VITE_DEMO_PRELOADED=false
 VITE_FORCE_LANDING_PAGE=false
 ```
+
+If `VITE_CIVICAID_STUDENT_ID` is omitted, the dashboard creates a browser-local student id and passes it to the ElevenLabs widget as a dynamic variable. This prevents public visitors from all loading the shared `demo_001` profile. For manual QA, open the dashboard with `?new_student=1` to reset the current browser to a fresh generated student id.
 
 Important note:
 

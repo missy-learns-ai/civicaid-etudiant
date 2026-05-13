@@ -20,9 +20,10 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_CIVICAID_API_BASE_URL || "http://127.0.0.1:8000";
 const ELEVENLABS_AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID || "";
-const STUDENT_ID = import.meta.env.VITE_CIVICAID_STUDENT_ID || "demo_001";
+const CONFIGURED_STUDENT_ID = import.meta.env.VITE_CIVICAID_STUDENT_ID || "";
 const DEMO_PRELOADED = import.meta.env.VITE_DEMO_PRELOADED === "true";
 const FORCE_LANDING_PAGE = import.meta.env.VITE_FORCE_LANDING_PAGE === "true";
+const STUDENT_ID_STORAGE_KEY = "civicaid_student_id";
 
 const DEMO_PROFILE_PATCH = {
   name: "Pratistha Thapa",
@@ -116,6 +117,38 @@ const DEMO_ROADMAP = {
 
 function normalizeRoadmap(response) {
   return response?.roadmap || response || null;
+}
+
+function createStudentId() {
+  if (window.crypto?.randomUUID) {
+    return `student_${window.crypto.randomUUID()}`;
+  }
+
+  return `student_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function resolveStudentId() {
+  if (CONFIGURED_STUDENT_ID) return CONFIGURED_STUDENT_ID;
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const shouldReset = searchParams.get("new_student") === "1";
+
+  if (shouldReset) {
+    const freshStudentId = createStudentId();
+    window.localStorage.setItem(STUDENT_ID_STORAGE_KEY, freshStudentId);
+    searchParams.delete("new_student");
+    const nextSearch = searchParams.toString();
+    const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", nextUrl);
+    return freshStudentId;
+  }
+
+  const existingStudentId = window.localStorage.getItem(STUDENT_ID_STORAGE_KEY);
+  if (existingStudentId) return existingStudentId;
+
+  const freshStudentId = createStudentId();
+  window.localStorage.setItem(STUDENT_ID_STORAGE_KEY, freshStudentId);
+  return freshStudentId;
 }
 
 function profileFingerprint(profile) {
@@ -629,6 +662,8 @@ function Metric({ label, value, suffix, tone }) {
 }
 
 export default function CivicAid() {
+  const studentIdRef = useRef(resolveStudentId());
+  const studentId = studentIdRef.current;
   const [profile, setProfile] = useState(DEMO_PRELOADED ? DEMO_PROFILE : null);
   const [roadmap, setRoadmap] = useState(DEMO_PRELOADED ? DEMO_ROADMAP : null);
   const [error, setError] = useState("");
@@ -644,7 +679,7 @@ export default function CivicAid() {
       refreshInFlightRef.current = true;
       setError("");
       try {
-        const fetchedProfile = await fetchProfile(STUDENT_ID);
+        const fetchedProfile = await fetchProfile(studentId);
         if (!fetchedProfile) {
           setProfile(null);
           setRoadmap(null);
@@ -656,7 +691,7 @@ export default function CivicAid() {
         setProfile(fetchedProfile);
 
         if (!roadmap?.steps?.length || nextFingerprint !== profileFingerprintRef.current) {
-          const fetchedRoadmap = await generateRoadmap(STUDENT_ID);
+          const fetchedRoadmap = await generateRoadmap(studentId);
           setRoadmap(fetchedRoadmap);
           profileFingerprintRef.current = nextFingerprint;
         }
@@ -673,7 +708,7 @@ export default function CivicAid() {
         refreshInFlightRef.current = false;
       }
     },
-    [roadmap?.steps?.length],
+    [roadmap?.steps?.length, studentId],
   );
 
   useEffect(() => {
@@ -688,7 +723,7 @@ export default function CivicAid() {
       <ElevenLabsWidget
         agentId={ELEVENLABS_AGENT_ID}
         dynamicVariables={{
-          student_id: STUDENT_ID,
+          student_id: studentId,
           api_base_url: API_BASE_URL,
           product_context: "CivicAid Étudiant student dashboard",
         }}
