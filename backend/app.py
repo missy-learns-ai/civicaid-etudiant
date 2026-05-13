@@ -174,6 +174,17 @@ class UpdateRenewalProfileRequest(ToolBaseModel):
 # Health check
 # ---------------------------------------------------------------------
 
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "service": "civicaid-etudiant-backend",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 @app.get("/health")
 def health_check():
     return {
