@@ -97,6 +97,49 @@ class ToolBaseModel(BaseModel):
         return value
 
 
+UNKNOWN_DATE_VALUES = {
+    "unknown",
+    "i don't know",
+    "i dont know",
+    "dont know",
+    "don't know",
+    "not sure",
+    "unsure",
+    "none",
+    "n/a",
+    "na",
+    "active",
+    "still active",
+    "valid",
+    "not available",
+}
+
+
+def optional_tool_date(value):
+    """
+    Voice agents sometimes send natural-language fragments for dates.
+    For optional dates, keep valid ISO values and turn unknown/free-text
+    answers into None so the roadmap can continue with an unknown field.
+    """
+    if value is None or isinstance(value, date):
+        return value
+
+    if isinstance(value, datetime):
+        return value.date()
+
+    if isinstance(value, str):
+        normalized = value.strip().lower().replace(".", "")
+        if not normalized or normalized in UNKNOWN_DATE_VALUES:
+            return None
+
+        try:
+            return date.fromisoformat(normalized)
+        except ValueError:
+            return None
+
+    return value
+
+
 # ---------------------------------------------------------------------
 # Extra request/response models
 # ---------------------------------------------------------------------
@@ -137,6 +180,11 @@ class UpdateArrivalVisaProfileRequest(ToolBaseModel):
     visa_validated: Optional[bool] = None
     has_french_address: Optional[bool] = None
 
+    @field_validator("arrival_date", mode="before")
+    @classmethod
+    def parse_optional_arrival_date(cls, value):
+        return optional_tool_date(value)
+
 
 class UpdateUniversityProfileRequest(ToolBaseModel):
     student_id: str = "demo_001"
@@ -168,6 +216,11 @@ class UpdateHousingCafProfileRequest(ToolBaseModel):
 class UpdateRenewalProfileRequest(ToolBaseModel):
     student_id: str = "demo_001"
     visa_expiry_date: Optional[date] = None
+
+    @field_validator("visa_expiry_date", mode="before")
+    @classmethod
+    def parse_optional_visa_expiry_date(cls, value):
+        return optional_tool_date(value)
 
 
 # ---------------------------------------------------------------------
@@ -423,6 +476,15 @@ def generate_arrival_roadmap(
                 "Call update_student_profile first."
             ),
         )
+
+    if profile.preferred_roadmap_scope != request.roadmap_scope.value:
+        profile = profile.model_copy(
+            update={
+                "preferred_roadmap_scope": request.roadmap_scope.value,
+                "updated_at": datetime.utcnow(),
+            }
+        )
+        save_profile(profile)
 
     return generate_arrival_roadmap_response(profile, request.roadmap_scope)
 

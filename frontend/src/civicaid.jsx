@@ -215,10 +215,17 @@ async function fetchProfile(studentId) {
   return response.profile || response;
 }
 
-async function generateRoadmap(studentId) {
+function inferRoadmapScope(profile) {
+  return profile?.preferred_roadmap_scope || "full";
+}
+
+async function generateRoadmap(studentId, profile) {
   const response = await apiRequest("/tools/generate-arrival-roadmap", {
     method: "POST",
-    body: JSON.stringify({ student_id: studentId }),
+    body: JSON.stringify({
+      student_id: studentId,
+      roadmap_scope: inferRoadmapScope(profile),
+    }),
   });
   return normalizeRoadmap(response);
 }
@@ -691,7 +698,7 @@ export default function CivicAid() {
         setProfile(fetchedProfile);
 
         if (!roadmap?.steps?.length || nextFingerprint !== profileFingerprintRef.current) {
-          const fetchedRoadmap = await generateRoadmap(studentId);
+          const fetchedRoadmap = await generateRoadmap(studentId, fetchedProfile);
           setRoadmap(fetchedRoadmap);
           profileFingerprintRef.current = nextFingerprint;
         }

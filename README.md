@@ -231,7 +231,7 @@ In that case, the agent should generate:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "roadmap_scope": "caf"
 }
 ```
@@ -266,7 +266,7 @@ Captures scope fields:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "nationality_category": "non_eu",
   "country": "Nepal"
 }
@@ -282,7 +282,7 @@ Captures arrival and visa information:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "has_arrived": true,
   "arrival_date": "2025-10-25",
   "visa_type": "vls_ts_student",
@@ -301,7 +301,7 @@ Captures CVEC and registration state:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "cvec_status": "done",
   "university_registration_status": "done",
   "has_certificat_scolarite": true,
@@ -319,7 +319,7 @@ Captures health-insurance registration state:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "ameli_registered": false
 }
 ```
@@ -334,7 +334,7 @@ Captures banking readiness:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "has_bank_account": false,
   "has_rib": false
 }
@@ -350,7 +350,7 @@ Captures housing and CAF intent:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "housing_status": "temporary",
   "has_permanent_housing": false,
   "has_rental_contract": false,
@@ -368,7 +368,7 @@ Captures visa or residence-document expiry:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "visa_expiry_date": "2027-09-09"
 }
 ```
@@ -383,7 +383,7 @@ Generate the full roadmap:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "roadmap_scope": "full"
 }
 ```
@@ -392,7 +392,7 @@ Generate a CAF-focused roadmap:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "roadmap_scope": "caf"
 }
 ```
@@ -407,7 +407,7 @@ Stores a short, non-sensitive summary:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "conversation_id": "conv_123",
   "summary": "The student is a non-EU student from Nepal who wants CAF guidance and needs bank/RIB and permanent housing steps."
 }
@@ -621,7 +621,7 @@ In this project, the React app loads the widget script and passes dynamic variab
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "api_base_url": "https://civicaid-etudiant-api.onrender.com",
   "product_context": "CivicAid Étudiant student dashboard"
 }

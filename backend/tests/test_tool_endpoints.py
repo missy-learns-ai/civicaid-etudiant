@@ -119,6 +119,7 @@ def test_all_profile_update_tools_persist_and_generate_roadmap(tmp_path, monkeyp
     )
 
     assert RoadmapStepId.RESIDENCE_RENEWAL not in caf_step_ids
+    assert storage.get_profile(student_id).preferred_roadmap_scope == "caf"
     assert bank_step.guidance_cards
     assert bank_step.guidance_cards[0].source_url == "https://www.campusfrance.org/en/getting-a-bank-account"
 

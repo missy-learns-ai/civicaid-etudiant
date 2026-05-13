@@ -11,6 +11,7 @@ from backend.models.student_profile import (
     StudentProfileUpdateRequest,
     VisaType,
 )
+from backend.app import UpdateArrivalVisaProfileRequest, UpdateRenewalProfileRequest
 
 
 def test_update_student_profile_accepts_flat_tool_payload():
@@ -103,6 +104,35 @@ def test_renewal_window_ignores_metadata():
         {
             "visa_expiry_date": "2027-09-09",
             "tool_call_id": "ignored_metadata",
+        }
+    )
+
+    assert request.visa_expiry_date == date(2027, 9, 9)
+
+
+def test_optional_tool_dates_accept_unknown_voice_answers():
+    renewal_request = UpdateRenewalProfileRequest.model_validate(
+        {
+            "student_id": "demo_voice",
+            "visa_expiry_date": "I don't know",
+        }
+    )
+    arrival_request = UpdateArrivalVisaProfileRequest.model_validate(
+        {
+            "student_id": "demo_voice",
+            "arrival_date": "still active",
+        }
+    )
+
+    assert renewal_request.visa_expiry_date is None
+    assert arrival_request.arrival_date is None
+
+
+def test_optional_tool_dates_keep_iso_dates():
+    request = UpdateRenewalProfileRequest.model_validate(
+        {
+            "student_id": "demo_voice",
+            "visa_expiry_date": "2027-09-09",
         }
     )
 

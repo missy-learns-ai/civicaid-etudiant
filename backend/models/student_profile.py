@@ -143,6 +143,12 @@ class StudentProfile(BaseModel):
     # CAF high-level intent
     wants_caf: Optional[bool] = Field(default=None)
 
+    # Roadmap presentation intent
+    preferred_roadmap_scope: Optional[str] = Field(
+        default=None,
+        description="Last roadmap scope requested by the agent, such as 'caf' or 'full'.",
+    )
+
     # Intake quality
     profile_confidence: ConfidenceLevel = Field(default=ConfidenceLevel.MEDIUM)
     unknown_fields: List[str] = Field(default_factory=list)
@@ -221,6 +227,7 @@ class StudentProfilePatch(ToolRequestModel):
     has_rental_contract: Optional[bool] = None
 
     wants_caf: Optional[bool] = None
+    preferred_roadmap_scope: Optional[str] = None
 
     profile_confidence: Optional[ConfidenceLevel] = None
     unknown_fields: Optional[List[str]] = None

@@ -53,10 +53,10 @@ Call this after the student gives useful structured information, such as:
 
 ```json
 {
-  "student_id": "demo_001",
+  "student_id": "{{student_id}}",
   "patch": {
     "nationality_category": "non_eu",
-    "country": "India",
+    "country": "Nepal",
     "has_arrived": true,
     "arrival_date": "2026-09-10",
     "visa_type": "vls_ts_student",
